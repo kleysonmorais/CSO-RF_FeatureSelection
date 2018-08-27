@@ -9,6 +9,7 @@
 
 from Models import *
 from EvaluationMetric.avaliador import AvaliadorController
+from random import randint
 import numpy as np
 import random
 import copy
@@ -83,12 +84,20 @@ class ParticulaController:
             elif abs(velocidade) > valorMaximo:
                 velocidade = -valorMaximo
             velocidade = self.sigmoid(velocidade)
+            # print(velocidade)
             #Condicional de definição 0 ou 1
-            if np.random.rand(1) < velocidade:
+            if velocidade > 0.5:
                 pLoser._posicao[i] = 1
-            else:            
+            elif velocidade < 0.5:
                 pLoser._posicao[i] = 0
-        
+            else:
+                # Igual a 0.5, recebe bit aleatório (0 ou 1)
+                pLoser._posicao[i] = randint(0, 1)
+            
+            # if np.random.rand(1) < velocidade:
+            #     pLoser._posicao[i] = 1
+            # else:            
+            #     pLoser._posicao[i] = 0
         return pWin, pLoser
         
     def sigmoid(self, x):
@@ -114,28 +123,44 @@ class EnxameController:
 
         print("Enxame Criado Com Sucesso")
         
-    def mediaEnxame(self, enxame):
-        total = 0
-        for particula in enxame._particulas:
-            binario = ''
-            for i, posicao in enumerate(particula._posicao):
-                binario = binario + str(posicao)
-            valor = int(binario, 2)
-            total = total + valor
-            tamanhoParticula = len(particula._posicao)
+    def novaMedia(self, enxame):
+        tamanho = len(enxame._particulas[0]._posicao)
+        particula_media = []
+        for index in range(tamanho):
+            somatorio = 0
+            for particula in enxame._particulas:
+                somatorio += particula._posicao[index]
+            media_enxame = float(somatorio)/float(tamanho)
+            
+            if media_enxame > 0.5:
+                particula_media.append(1)
+            elif media_enxame < 0.5:
+                particula_media.append(0)
+            else:
+                # Igual a 0.5
+                # Recebe um número aleatório (0 ou 1)
+                particula_media.append(randint(0, 1))
+        return particula_media
 
-        media = int(total/len(enxame._particulas))
-        binario = '{0:08b}'.format(media)
-        charList = list(binario)
-
-        if (tamanhoParticula - len(charList)) > 0:
-            media_enxame = [0] * (tamanhoParticula - len(charList))
-        else:
-            media_enxame = []
-        
-        for i, bit in enumerate(charList):
-            media_enxame.append(int(bit))
-        return media_enxame
+    # def mediaEnxame(self, enxame):
+    #     total = 0
+    #     for particula in enxame._particulas:
+    #         binario = ''
+    #         for i, posicao in enumerate(particula._posicao):
+    #             binario = binario + str(posicao)
+    #         valor = int(binario, 2)
+    #         total = total + valor
+    #         tamanhoParticula = len(particula._posicao)
+    #     media = int(total/len(enxame._particulas))
+    #     binario = '{0:08b}'.format(media)
+    #     charList = list(binario)
+    #     if (tamanhoParticula - len(charList)) > 0:
+    #         media_enxame = [0] * (tamanhoParticula - len(charList))
+    #     else:
+    #         media_enxame = []
+    #     for i, bit in enumerate(charList):
+    #         media_enxame.append(int(bit))
+    #     return media_enxame
         
     def verificarMelhorPosicaoEnxame(self, enxame):
         print("Verificando Melhor Posição do Enxame")
@@ -151,7 +176,7 @@ class EnxameController:
         
         enxameNovo = EnxameModel()
         # Selecionar duas Partículas do enxame
-        media_enxame = self.mediaEnxame(enxame)
+        media_enxame = self.novaMedia(enxame)
 
         while len(enxame._particulas) > 0:
             if len(enxame._particulas) >= 2:

@@ -53,6 +53,6 @@ if __name__ == "__main__":
     geracoes = int(sys.argv[3])
 
     enxame, enxameController, avaliarController = inicializa(nomeBase, qtdParticulas)
-    # movimentar(enxame, enxameController, geracoes)
-    # avaliar(enxame, enxameController)
+    movimentar(enxame, enxameController, geracoes)
+    avaliar(enxame, enxameController, avaliarController)
 
